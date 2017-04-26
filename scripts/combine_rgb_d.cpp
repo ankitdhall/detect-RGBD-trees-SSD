@@ -1,0 +1,64 @@
+#include <opencv2/highgui/highgui.hpp> 
+#include <stdio.h>
+#include <iostream>
+using namespace std;
+using namespace cv;
+
+int inspect()
+{	
+	Mat img;
+	img = imread("JPEGImages_VOC2007/000002.png", -1);
+	cout << "Channels:" << img.channels() << endl;
+
+	Mat abgr[4];
+	split(img, abgr);
+	imshow("disparity", abgr[0]);
+	waitKey(0);
+
+	vector<Mat> channels;
+	Mat bgr[3], fin_img;
+
+	channels.push_back(abgr[1]);
+	channels.push_back(abgr[2]);
+	channels.push_back(abgr[3]);
+
+	merge(channels, fin_img);
+
+	
+	imshow("rgb", fin_img);
+	waitKey(0);
+}
+
+int main()
+{
+    Mat img_rgb, img_d, fin_img;
+	char filename_rgb[1000], filename_d[1000], filename[1000];
+	for(int i=0; i<=34; i+=2)
+	{
+		sprintf(filename_rgb, "RGB/L%06d.png", i);
+		sprintf(filename_d, "D/L%06d_left_disparity.png", i);
+		sprintf(filename, "%06d.png", i);
+		img_rgb = imread(filename_rgb);
+		img_d = imread(filename_d, CV_LOAD_IMAGE_GRAYSCALE);
+		vector<Mat> channels;
+		Mat bgr[3];
+		split(img_rgb, bgr);
+
+		channels.push_back(img_d);
+		channels.push_back(bgr[0]);
+		channels.push_back(bgr[1]);
+		channels.push_back(bgr[2]);
+	
+	
+		merge(channels, fin_img);
+		//imshow("img", fin_img);
+		//waitKey(0);
+		//Mat abgr[4];
+		//split(fin_img, abgr);
+		//imshow("disparity", abgr[0]);
+		imwrite(filename, fin_img);
+		//waitKey(0);
+	}
+	//inspect();
+    return 0;
+}
